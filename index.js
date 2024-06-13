@@ -115,6 +115,10 @@ async function run() {
 }
 run().catch(console.log);
 
+app.get('/',(req,res=>{
+
+  res.send("Hello Planify")
+}))
 
 app.listen(port,()=>{
         console.log("Server Run in port ",port)
