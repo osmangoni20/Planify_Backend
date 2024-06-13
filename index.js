@@ -37,6 +37,75 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
+    const Taskdatabase= await client.db("TaskDB")
+    const UserDatabase=await client.db("UserDB");
+    const TaskList=await Taskdatabase.collection("TaskList")
+    const UserCollection=await UserDatabase.collection("UserCollection");
+    app.get('/task', async(req,res)=>{
+        const result= await TaskList.find().toArray();
+       return res.send(result);
+    })
+    app.get('/task/:id', async(req,res)=>{
+        const id=req.params.id
+        const result= await TaskList.findOne({_id: new ObjectId(id)});
+        res.send(result);
+    })
+    app.post('/create_task', async(req,res)=>{
+      
+        const data= await req.body;
+        const result= await TaskList.insertOne(data);
+        res.send(result);
+    })
+    
+    app.patch('/task/:id', async(req,res)=>{
+        const UpdateData=req.body;
+        const id= req.params.id;
+     
+        const result= await TaskList.updateOne({_id: new ObjectId(id)},
+        {$set:UpdateData});
+        res.send(result);
+    })
+    app.delete('/task/:id', async(req,res)=>{
+        const id=req.params.id
+        const result= await TaskList.deleteOne({_id: new ObjectId(id)});
+        res.send(result);
+    })
+    app.get('/user', async(req,res)=>{
+      const email=req.params.id
+      const result= await UserCollection.findOne({email: email});
+      res.send(result);
+  })
+  app.get('/user/:email', async(req,res)=>{
+    const email=req.params.email
+    const result= await UserCollection.findOne({email: email});
+    res.send(result);
+   
+})
+    app.post('/add_user', async(req,res)=>{
+      const newUser=req.body;
+     
+      const token=createToken(newUser);
+    
+      const isExistUser= await UserCollection.findOne({email:newUser?.email})
+      if(isExistUser){
+        return res.send({
+          status:"200",
+          message:"Successfully LoggedIn",
+          token
+        })
+      }
+     await UserCollection.insertOne(newUser);
+    return res.send({token})
+    })
+    app.patch('/user/:email',verifyToken, async(req,res)=>{
+      const UpdateData=req.body;
+      const email= req.params.email;
+      
+      const result= await UserCollection.updateOne({email:email},
+      {$set:UpdateData});
+    
+      res.send(result);
+  })
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
@@ -51,4 +120,3 @@ app.get('/', (req, res) => {
 app.listen(port,()=>{
         console.log("Server Run in port ",port)
 })
-
