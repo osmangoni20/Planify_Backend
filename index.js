@@ -6,7 +6,6 @@ app.use(cors());
 app.use(express.json())
 const port=3000;
 const upload_Destination='uploads/'
-const path=require(path)
 const jwt=require('jsonwebtoken');
 const uri = "mongodb+srv://osmangoni0827:UmIefQcU42X5AKwA@cluster0.65pglqj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const multer=require('multer');
